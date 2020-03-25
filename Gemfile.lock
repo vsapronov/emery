@@ -1,0 +1,19 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    json (2.0.4)
+    power_assert (0.4.1)
+    test-unit (3.2.3)
+      power_assert
+    test-unit-runner-junitxml (0.1.1)
+      test-unit
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  json
+  test-unit-runner-junitxml
+
+BUNDLED WITH
+   2.1.4
