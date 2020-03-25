@@ -1,0 +1,47 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.4.9
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Check Base64
+          command: echo -n '$RUBYGEMS_API_KEY' | base64
+      - run:
+          name: Build gem
+          command: |
+            export VERSION=0.0.<<pipeline.number>>
+            gem build emery.gemspec
+      - setup-rubygems_key
+      - run:
+          name: Push gem
+          command: |
+            if [ $CIRCLE_BRANCH = "master" ]; then
+              export VERSION=0.0.<<pipeline.number>>
+              gem push --key rubygems emery-$VERSION.gem
+            else
+              echo "Will not release - not running on master branch"
+            fi
+
+commands:
+  setup-rubygems_key:
+    steps:
+      - run:
+          name: Write key
+          command: |
+            mkdir ~/.gem
+            tee > ~/.gem/credentials \<<END
+            ---
+            :rubygems_api_key: $RUBYGEMS_API_KEY
+            END
+            chmod 600 ~/.gem/credentials
+
+workflows:
+  build-release:
+    jobs:
+      - build:
+          context: emery
