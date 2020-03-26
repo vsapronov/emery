@@ -216,13 +216,13 @@ module Emery
   end
 
   class AnyDeserialization < Test::Unit::TestCase
-    def test_deserialize_any
+    def test_deserialize
       data = Jsoner.from_json(T.any(String, Integer), '"the string"')
       T.check(T.any(String, Integer), data)
       assert_equal "the string", data, "Should parse any type"
     end
 
-    def test_deserialize_any_fail
+    def test_deserialize_fail
       assert_raise JsonerError do
         Jsoner.from_json(T.any(Integer, Float), '"the string"')
       end
@@ -230,10 +230,31 @@ module Emery
   end
 
   class AnySerialization < Test::Unit::TestCase
-    def test_serialize_any
+    def test_serialize
       data = Jsoner.to_json(T.any(String, Integer), "the string")
       T.check(T.any(String, Integer), data)
       assert_equal '"the string"', data, "Should serialize any type"
+    end
+  end
+
+  class UnionDeserialization < Test::Unit::TestCase
+    def test_deserialize
+      data = Jsoner.from_json(T.union(str: String, int: Integer), '{"str":"the string"}')
+      T.check(T.union(str: String, int: Integer), data)
+      assert_equal "the string", data, "Should parse union type"
+    end
+
+    def test_deserialize_any_fail
+      assert_raise JsonerError do
+        Jsoner.from_json(T.union(str: String, int: Integer), '{"bool":true}')
+      end
+    end
+  end
+
+  class UnionSerialization < Test::Unit::TestCase
+    def test_serialize
+      data = Jsoner.to_json(T.union(str: String, int: Integer), "the string")
+      assert_equal '{"str":"the string"}', data, "Should serialize union type with wrapping object"
     end
   end
 end
