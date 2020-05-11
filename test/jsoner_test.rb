@@ -213,6 +213,28 @@ class HashSerialization < Test::Unit::TestCase
   end
 end
 
+class UntypedDeserialization < Test::Unit::TestCase
+  def test_deserialize_hash
+    data = Jsoner.from_json(Untyped, '{"one":123,"two":"some string"}')
+    assert_equal ({"one" => 123, "two" => "some string"}), data
+  end
+
+  def test_deserialize_array
+    data = Jsoner.from_json(Untyped, '[123,"some string"]')
+    assert_equal [123, "some string"], data
+  end
+end
+
+class UntypedSerialization < Test::Unit::TestCase
+  def test_serialize_hash
+    assert_equal '{"one":123,"two":"some string"}', Jsoner.to_json(Untyped, {"one" => 123, "two" => "some string"})
+  end
+
+  def test_serialize_array
+    assert_equal '[123,"some string"]', Jsoner.to_json(Untyped, [123, "some string"])
+  end
+end
+
 class AnyDeserialization < Test::Unit::TestCase
   def test_deserialize
     data = Jsoner.from_json(T.any(String, Integer), '"the string"')
