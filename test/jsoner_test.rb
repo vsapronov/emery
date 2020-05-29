@@ -33,10 +33,16 @@ class PlainTypesDeserialization < Test::Unit::TestCase
     end
   end
 
-  def test_deserialize_boolean
+  def test_deserialize_true
     data = Jsoner.from_json(Boolean, 'true')
     T.check(Boolean, data)
-    assert_equal true, data, "Boolean should be parsable from JSON"
+    assert_equal true, data, "Boolean true should be parsable from JSON"
+  end
+
+  def test_deserialize_false
+    data = Jsoner.from_json(Boolean, 'false')
+    T.check(Boolean, data)
+    assert_equal false, data, "Boolean false should be parsable from JSON"
   end
 
   def test_deserialize_boolean_fail

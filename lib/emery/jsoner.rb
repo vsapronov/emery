@@ -72,7 +72,7 @@ module Jsoner
       types.each do |type|
         begin
           return Jsoner.deserialize(type, json_value)
-        rescue TypeError
+        rescue JsonerError
         end
       end
       raise JsonerError.new("Value '#{json_value.inspect.to_s}' can not be deserialized as any of #{@types.map { |t| t.to_s}.join(', ')}")
