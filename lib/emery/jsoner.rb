@@ -1,8 +1,6 @@
 require "json"
 require "date"
 
-require "emery/type"
-
 class JsonerError < StandardError
 end
 

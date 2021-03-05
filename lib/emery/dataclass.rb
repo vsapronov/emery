@@ -39,6 +39,10 @@ module DataClass
     return self.class.new(new_params)
   end
 
+  def to_json
+    return Jsoner.serialize(self.class, self)
+  end
+
   def self.included(base)
     base.extend ClassMethods
   end
