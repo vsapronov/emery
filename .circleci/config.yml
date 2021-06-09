@@ -15,6 +15,7 @@ jobs:
           name: Test gem
           command: |
             export VERSION=0.0.<<pipeline.number>>
+            bundle --version
             bundle install
             rake test
       - store_test_results:
