@@ -11,6 +11,7 @@ jobs:
       - run:
           name: Test gem
           command: |
+            gem install bundler
             export VERSION=0.0.<<pipeline.number>>
             bundle --version
             bundle install
