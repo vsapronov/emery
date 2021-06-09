@@ -9,9 +9,6 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Check Base64
-          command: echo -n '$RUBYGEMS_API_KEY' | base64
-      - run:
           name: Test gem
           command: |
             export VERSION=0.0.<<pipeline.number>>
