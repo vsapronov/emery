@@ -12,14 +12,19 @@ jobs:
           name: Check Base64
           command: echo -n '$RUBYGEMS_API_KEY' | base64
       - run:
-          name: Build gem
+          name: Test gem
+          command: |
+            export VERSION=0.0.<<pipeline.number>>
+            bundle install
+            rake test
+      - store_test_results:
+          path: ./test-results
+      - setup-rubygems_key
+      - run:
+          name: Build and push gem
           command: |
             export VERSION=0.0.<<pipeline.number>>
             gem build emery.gemspec
-      - setup-rubygems_key
-      - run:
-          name: Push gem
-          command: |
             if [ $CIRCLE_BRANCH = "master" ]; then
               export VERSION=0.0.<<pipeline.number>>
               gem push --key rubygems emery-$VERSION.gem
