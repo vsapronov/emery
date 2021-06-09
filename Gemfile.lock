@@ -3,7 +3,7 @@ GEM
   specs:
     json (2.3.0)
     power_assert (0.4.1)
-    test-unit (3.2.3)
+    test-unit (3.4.4)
       power_assert
     test-unit-runner-junitxml (0.1.1)
       test-unit
