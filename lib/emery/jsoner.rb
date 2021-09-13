@@ -4,28 +4,28 @@ class JsonerError < StandardError
 end
 
 module Jsoner
-  @@serializers = [
-      Serializers::FloatSerializer,
-      Serializers::DateSerializer,
-      Serializers::DateTimeSerializer,
-      Serializers::StringFormattedSerializer,
-      Serializers::UnionSerializer,
-      Serializers::NilableSerializer,
-      Serializers::ArraySerializer,
-      Serializers::HashSerializer,
-      Serializers::UnknownSerializer,
-      Serializers::EnumSerializer,
-      Serializers::DataClassSerializer,
-      Serializers::TaggedUnionSerializer,
-      Serializers::BuiltinTypeSerializer,
+  @@codecs = [
+    Codecs::FloatCodec,
+    Codecs::DateCodec,
+    Codecs::DateTimeCodec,
+    Codecs::StringFormattedCodec,
+    Codecs::UnionCodec,
+    Codecs::NilableCodec,
+    Codecs::ArrayCodec,
+    Codecs::HashCodec,
+    Codecs::UnknownCodec,
+    Codecs::EnumCodec,
+    Codecs::DataClassCodec,
+    Codecs::TaggedUnionCodec,
+    Codecs::BuiltinTypeCodec,
   ]
 
-  def self.set_serializer(serializer)
-    @@serializers.insert(0, serializer)
+  def self.insert_codec(codec)
+    @@codecs.insert(0, codec)
   end
 
-  def Jsoner.find_serializer(type)
-    @@serializers.each do |serializer|
+  def Jsoner.find_codec(type)
+    @@codecs.each do |serializer|
       if serializer.applicable?(type)
         return serializer
       end
@@ -40,11 +40,11 @@ module Jsoner
 
   def Jsoner.deserialize(type, json_value)
     begin
-      serializer = Jsoner.find_serializer(type)
-      if serializer == nil
+      codec = Jsoner.find_codec(type)
+      if codec == nil
         raise JsonerError.new("Type #{type} is not supported in Jsoner deserialization")
       end
-      return serializer.deserialize(type, json_value)
+      return codec.deserialize(type, json_value)
     rescue StandardError => error
       raise JsonerError.new(error.message)
     end
@@ -56,11 +56,11 @@ module Jsoner
 
   def Jsoner.serialize(type, value)
     begin
-      serializer = Jsoner.find_serializer(type)
-      if serializer == nil
+      codec = Jsoner.find_codec(type)
+      if codec == nil
         raise JsonerError.new("Type #{type} is not supported in Jsoner serialization")
       end
-      return serializer.serialize(type, value)
+      return codec.serialize(type, value)
     rescue StandardError => error
       raise JsonerError.new(error.message)
     end

@@ -1,7 +1,7 @@
 require "date"
 
-module Serializers
-  module BuiltinTypeSerializer
+module Codecs
+  module BuiltinTypeCodec
     def self.applicable?(type)
       [String, Float, Integer, TrueClass, FalseClass, NilClass].include? type
     end
@@ -13,7 +13,7 @@ module Serializers
     end
   end
 
-  module UnknownSerializer
+  module UnknownCodec
     def self.applicable?(type)
       type.instance_of? T::UnknownType
     end
@@ -25,7 +25,7 @@ module Serializers
     end
   end
 
-  module ArraySerializer
+  module ArrayCodec
     def self.applicable?(type)
       type.instance_of? T::ArrayType
     end
@@ -44,7 +44,7 @@ module Serializers
     end
   end
 
-  module HashSerializer
+  module HashCodec
     def self.applicable?(type)
       type.instance_of? T::HashType
     end
@@ -73,7 +73,7 @@ module Serializers
     end
   end
 
-  module UnionSerializer
+  module UnionCodec
     def self.applicable?(type)
       type.instance_of? T::UnionType
     end
@@ -93,7 +93,7 @@ module Serializers
     end
   end
 
-  module NilableSerializer
+  module NilableCodec
     def self.applicable?(type)
       type.instance_of? T::NilableType
     end
@@ -113,7 +113,7 @@ module Serializers
     end
   end
 
-  module StringFormattedSerializer
+  module StringFormattedCodec
     def self.applicable?(type)
       type.instance_of? T::StringFormattedType
     end
@@ -125,7 +125,7 @@ module Serializers
     end
   end
 
-  module FloatSerializer
+  module FloatCodec
     def self.applicable?(type)
       type == Float
     end
@@ -138,7 +138,7 @@ module Serializers
     end
   end
 
-  module DateTimeSerializer
+  module DateTimeCodec
     def self.applicable?(type)
       type == DateTime
     end
@@ -156,7 +156,7 @@ module Serializers
     end
   end
 
-  module DateSerializer
+  module DateCodec
     def self.applicable?(type)
       type == Date
     end
@@ -174,7 +174,7 @@ module Serializers
     end
   end
 
-  module EnumSerializer
+  module EnumCodec
     def self.applicable?(type)
       type.respond_to? :ancestors and type.ancestors.include? Enum
     end
@@ -187,7 +187,7 @@ module Serializers
     end
   end
 
-  module DataClassSerializer
+  module DataClassCodec
     def self.applicable?(type)
       type.respond_to? :ancestors and type.ancestors.include? DataClass
     end
@@ -209,7 +209,7 @@ module Serializers
     end
   end
 
-  module TaggedUnionSerializer
+  module TaggedUnionCodec
     def self.applicable?(type)
       type.respond_to? :ancestors and type.ancestors.include? TaggedUnion
     end
