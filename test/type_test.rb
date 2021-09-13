@@ -1,7 +1,7 @@
 require "test/unit/runner/junitxml"
 require "date"
 
-require 'emery'
+require "emery"
 
 class TypeEquality < Test::Unit::TestCase
   def test_plain_equals
@@ -84,10 +84,6 @@ class TypeToString < Test::Unit::TestCase
 
   def test_union
     assert_equal "Union[String, Integer]", T.union(String, Integer).to_s
-  end
-
-  def test_tagged_union
-    assert_equal "TaggedUnion[str: String, int: Integer]", T.tagged_union({str: String, int: Integer}).to_s
   end
 end
 
@@ -201,18 +197,6 @@ class TypeCheckUnion < Test::Unit::TestCase
   def test_fail
     assert_raise TypeError do
       T.check(T.union(String, Integer), true)
-    end
-  end
-end
-
-class TypeCheckTaggedUnion < Test::Unit::TestCase
-  def test_success
-    assert_equal({int: 123}, T.check(T.tagged_union({str: String, int: Integer}), {int: 123}))
-  end
-
-  def test_fail
-    assert_raise TypeError do
-      T.check(T.tagged_union({str: String, int: Integer}), true)
     end
   end
 end

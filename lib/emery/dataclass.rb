@@ -21,13 +21,13 @@ module DataClass
   end
 
   def copy(params)
-    params.each do |attr, attr_value|
+    params.keys.each do |attr|
       if !self.class.typed_attributes.key?(attr)
         raise TypeError.new("Non existing attribute #{attr}")
       end
     end
     new_params =
-      self.class.typed_attributes.map do |attr, attr_type|
+      self.class.typed_attributes.keys.map do |attr|
         attr_value =
           if params.key?(attr)
             params[attr]

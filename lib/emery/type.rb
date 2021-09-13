@@ -53,28 +53,6 @@ module T
     end
   end
 
-  class TaggedUnionType
-    attr_reader :cases
-    attr_reader :discriminator
-    def initialize(cases, discriminator = nil)
-      @cases = cases
-      @discriminator = discriminator
-    end
-    def to_s
-      "TaggedUnion[#{cases.map { |k, t| "#{k}: #{t}"}.join(', ')}]"
-    end
-    def check(value)
-      T.check_not_nil(self, value)
-      if !value.is_a? Hash
-        raise TypeError.new("Value '#{value.inspect.to_s}' type is #{value.class} - Hash is required for tagged union")
-      end
-    end
-    def ==(other)
-      return false
-      #      T.instance_of?(TaggedUnionType, other) and (self.cases - other.cases).empty?
-    end
-  end
-
   class ArrayType
     attr_reader :item_type
     def initialize(item_type)
@@ -176,10 +154,6 @@ module T
 
   def T.union(*typdefs)
     UnionType.new(*typdefs)
-  end
-
-  def T.tagged_union(cases, discriminator=nil)
-    TaggedUnionType.new(cases, discriminator)
   end
 
   def T.check_var(var_name, type, value)

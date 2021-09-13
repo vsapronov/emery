@@ -197,7 +197,7 @@ module Serializers
         attr_value = json_value[attr.to_s]
         [attr, Jsoner.deserialize(attr_type, attr_value)]
       end
-      return type.new parameters.to_h
+      return type.new(parameters.to_h)
     end
 
     def self.serialize(type, value)
@@ -211,44 +211,44 @@ module Serializers
 
   module TaggedUnionSerializer
     def self.applicable?(type)
-      type.instance_of? T::TaggedUnionType
+      type.respond_to? :ancestors and type.ancestors.include? TaggedUnion
     end
     def self.deserialize(type, json_value)
       if !json_value.is_a?(Hash)
-        raise JsonerError.new("JSON value type #{json_value.class} is not Hash but it has to be Hash to represent union")
+        raise JsonerError.new("JSON value type #{json_value.class} is not Hash but it has to be Hash to represent a union")
       end
       if type.discriminator == nil
         if json_value.keys.length != 1
-          raise JsonerError.new("JSON value #{json_value} should have only one key to represent union type, found #{json_value.keys.length}")
+          raise JsonerError.new("JSON value #{json_value} should have only one key to represent union type wrapper object, found #{json_value.keys.length}")
         end
-        case_key = json_value.keys[0]
-        if not type.cases.key? case_key.to_sym
-          raise JsonerError.new("JSON key '#{case_key}' does not match any case in union type #{self}")
+        tag_key = json_value.keys[0]
+        if not type.typed_tags.key? tag_key.to_sym
+          raise JsonerError.new("JSON key '#{tag_key}' does not match any tag in union type #{self}")
         end
-        case_type = type.cases[case_key.to_sym]
-        case_json_value = json_value[case_key]
-        case_value = Jsoner.deserialize(case_type, case_json_value)
-        return {case_key.to_sym => case_value}
+        tag_type = type.typed_tags[tag_key.to_sym]
+        tag_json_value = json_value[tag_key]
+        tag_value = Jsoner.deserialize(tag_type, tag_json_value)
+        return type.new({tag_key.to_sym => tag_value})
       else
         if not json_value.key? type.discriminator
           raise JsonerError.new("JSON value #{json_value} does not have discriminator field #{type.discriminator}")
         end
-        case_key = json_value[type.discriminator]
-        case_type = type.cases[case_key.to_sym]
-        case_value = Jsoner.deserialize(case_type, json_value)
-        return {case_key.to_sym => case_value}
+        tag_key = json_value[type.discriminator]
+        tag_type = type.typed_tags[tag_key.to_sym]
+        tag_value = Jsoner.deserialize(tag_type, json_value)
+        return type.new({tag_key.to_sym => tag_value})
       end
     end
     def self.serialize(type, value)
       T.check(type, value)
-      case_key = value.keys[0]
-      case_type = type.cases[case_key]
-      case_json_value = Jsoner.serialize(case_type, value[case_key])
+      tag_key = value.current_tag
+      tag_type = type.typed_tags[tag_key]
+      tag_json_value = Jsoner.serialize(tag_type, value.send(tag_key))
       if type.discriminator == nil
-        return { case_key => case_json_value }
+        return { tag_key => tag_json_value }
       else
-        case_json_value[type.discriminator] = case_key
-        return case_json_value
+        tag_json_value[type.discriminator] = tag_key
+        return tag_json_value
       end
     end
   end

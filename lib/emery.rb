@@ -1,5 +1,6 @@
 require 'emery/type'
 require 'emery/enum'
 require 'emery/dataclass'
+require 'emery/taggedunion'
 require 'emery/serializers'
 require 'emery/jsoner'

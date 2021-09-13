@@ -1,6 +1,6 @@
 require "test/unit/runner/junitxml"
 
-require 'emery'
+require "emery"
 
 class PlainTypesDeserialization < Test::Unit::TestCase
   def test_deserialize_integer

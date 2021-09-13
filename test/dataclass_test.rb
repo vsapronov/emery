@@ -1,6 +1,6 @@
 require "test/unit/runner/junitxml"
 
-require 'emery'
+require "emery"
 
 class DataClassTypeEquality < Test::Unit::TestCase
   def test_equals
@@ -93,10 +93,6 @@ class DataClassJson < Test::Unit::TestCase
       Jsoner.from_json(TheClass, '"string"')
     end
   end
-
-  # def test_serialize_hash
-  #   assert_equal '{"string":"the string","int":123}', Jsoner.to_json(TheClass, { string: "the string", int: 123 }), "nil should be serializable to JSON"
-  # end
 end
 
 class TheClass

@@ -1,6 +1,6 @@
 require "test/unit/runner/junitxml"
 
-require 'emery'
+require "emery"
 
 class TypeCheckEnum < Test::Unit::TestCase
   def test_success
