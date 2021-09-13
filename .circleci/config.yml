@@ -25,7 +25,7 @@ jobs:
             export VERSION=0.0.<<pipeline.number>>
             gem build emery.gemspec
             if [ $CIRCLE_BRANCH = "main" ]; then
-              export VERSION=0.0.<<pipeline.number>>
+              export VERSION=0.1.<<pipeline.number>>
               gem push --key rubygems emery-$VERSION.gem
             else
               echo "Will not release - not running on main branch"
