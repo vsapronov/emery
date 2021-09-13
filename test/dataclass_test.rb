@@ -1,6 +1,6 @@
 require "test/unit/runner/junitxml"
 
-require 'emery'
+require "emery"
 
 class DataClassTypeEquality < Test::Unit::TestCase
   def test_equals
@@ -14,7 +14,7 @@ end
 
 class DataClassFields < Test::Unit::TestCase
   def test_fields_meta
-    assert_equal ({:string => String, :int => Integer}), TheClass.json_attributes, "Attributes with types should be available on data class"
+    assert_equal ({:string => String, :int => Integer}), TheClass.typed_attributes, "Attributes with types should be available on data class"
   end
 
   def test_read
@@ -51,37 +51,6 @@ class DataClassEquality < Test::Unit::TestCase
   end
 end
 
-class DataClassDeserialization < Test::Unit::TestCase
-  def test_deserialize_object
-    data = Jsoner.from_json(TheClass, '{"string": "the string", "int": 123}')
-    T.check(TheClass, data)
-    assert_equal TheClass.new(string: "the string", int: 123), data, "Should parse data class object"
-  end
-
-  def test_deserialize_nested_object
-    data = Jsoner.from_json(TheClassWithNested, '{"nested": {"string": "the string", "int": 123}}')
-    T.check(TheClassWithNested, data)
-    assert_equal TheClassWithNested.new(nested: TheClass.new(string: "the string", int: 123)), data, "Should parse nested data class object"
-  end
-
-  def test_deserialize_object_fail
-    assert_raise JsonerError do
-      Jsoner.from_json(TheClass, '"string"')
-    end
-  end
-
-end
-
-class DataClassSerialization < Test::Unit::TestCase
-  def test_serialize_object
-    assert_equal '{"string":"the string","int":123}', Jsoner.to_json(TheClass, TheClass.new(string: "the string", int: 123)), "nil should be serializable to JSON"
-  end
-
-  def test_serialize_array_of_objects
-    assert_equal '[{"string":"the string","int":123},{"string":"the string 2","int":456}]', Jsoner.to_json(T.array(TheClass), [TheClass.new(string: "the string", int: 123), TheClass.new(string: "the string 2", int: 456)]), "Array of objects should be serializable to JSON"
-  end
-end
-
 class DataClassCopy < Test::Unit::TestCase
   def test_copy
     a = TheClass.new(string: "the string", int: 123)
@@ -94,6 +63,34 @@ class DataClassCopy < Test::Unit::TestCase
     assert_raise TypeError do
       a = TheClass.new(string: "the string", int: 123)
       a.copy(non_existing: "the other string")
+    end
+  end
+end
+
+class DataClassJson < Test::Unit::TestCase
+  def test_serialize_object
+    assert_equal '{"string":"the string","int":123}', Jsoner.to_json(TheClass, TheClass.new(string: "the string", int: 123)), "nil should be serializable to JSON"
+  end
+
+  def test_deserialize_object
+    data = Jsoner.from_json(TheClass, '{"string": "the string", "int": 123}')
+    T.check(TheClass, data)
+    assert_equal TheClass.new(string: "the string", int: 123), data, "Should parse data class object"
+  end
+
+  def test_serialize_array_of_objects
+    assert_equal '[{"string":"the string","int":123},{"string":"the string 2","int":456}]', Jsoner.to_json(T.array(TheClass), [TheClass.new(string: "the string", int: 123), TheClass.new(string: "the string 2", int: 456)]), "Array of objects should be serializable to JSON"
+  end
+
+  def test_deserialize_nested_object
+    data = Jsoner.from_json(TheClassWithNested, '{"nested": {"string": "the string", "int": 123}}')
+    T.check(TheClassWithNested, data)
+    assert_equal TheClassWithNested.new(nested: TheClass.new(string: "the string", int: 123)), data, "Should parse nested data class object"
+  end
+
+  def test_deserialize_object_fail
+    assert_raise JsonerError do
+      Jsoner.from_json(TheClass, '"string"')
     end
   end
 end

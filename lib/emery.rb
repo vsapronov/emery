@@ -1,4 +1,6 @@
 require 'emery/type'
-require 'emery/jsoner'
 require 'emery/enum'
 require 'emery/dataclass'
+require 'emery/taggedunion'
+require 'emery/codecs'
+require 'emery/jsoner'

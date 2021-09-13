@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = "emery"
   s.summary     = "Type safety library"
-  s.version     = ENV["VERSION"]
+  s.version     = "0.0.0"
   s.files       = Dir.glob("{lib,test}/**/*")
   s.authors     = ["Vladimir Sapronov"]
   s.license     = "MIT"

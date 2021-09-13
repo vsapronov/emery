@@ -28,7 +28,7 @@ jobs:
               export VERSION=0.0.<<pipeline.number>>
               gem push --key rubygems emery-$VERSION.gem
             else
-              echo "Will not release - not running on master branch"
+              echo "Will not release - not running on main branch"
             fi
 
 commands:
