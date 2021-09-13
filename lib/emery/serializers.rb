@@ -1,3 +1,5 @@
+require "date"
+
 module Serializers
   module BuiltinTypeSerializer
     def self.applicable?(type)
