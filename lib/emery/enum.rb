@@ -21,14 +21,6 @@ module Enum
       end
     end
 
-    def jsoner_deserialize(json_value)
-      T.check(self, json_value)
-    end
-
-    def jsoner_serialize(value)
-      T.check(self, value)
-    end
-
     def define(key, value)
       @_enum_hash ||= {}
       @_enums_by_value ||= {}

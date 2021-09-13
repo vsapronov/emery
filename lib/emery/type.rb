@@ -1,3 +1,5 @@
+require 'emery/enum'
+
 module T
   def T.check_not_nil(type, value)
     if value == nil
@@ -5,40 +7,40 @@ module T
     end
   end
 
-  class UntypedType
+  class UnknownType
     def to_s
-      "Untyped"
+      "Unknown"
     end
     def check(value)
       T.check_not_nil(self, value)
     end
   end
 
-  class Nilable
-    attr_reader :type
-    def initialize(type)
-      @type = type
+  class NilableType
+    attr_reader :inner_type
+    def initialize(inner_type)
+      @inner_type = inner_type
     end
     def to_s
-      "Nilable[#{type.to_s}]"
+      "Nilable[#{inner_type.to_s}]"
     end
     def check(value)
       if value != nil
-        T.check(type, value)
+        T.check(inner_type, value)
       end
     end
     def ==(other)
-      T.instance_of?(Nilable, other) and self.type == other.type
+      T.instance_of?(NilableType, other) and self.inner_type == other.inner_type
     end
   end
 
-  class AnyType
+  class UnionType
     attr_reader :types
     def initialize(*types)
       @types = types
     end
     def to_s
-      "Any[#{types.map { |t| t.to_s}.join(', ')}]"
+      "Union[#{types.map { |t| t.to_s}.join(', ')}]"
     end
     def check(value)
       type = types.find {|t| T.instance_of?(t, value) }
@@ -47,18 +49,29 @@ module T
       end
     end
     def ==(other)
-      T.instance_of?(AnyType, other) and (self.types - other.types).empty?
+      T.instance_of?(UnionType, other) and (self.types - other.types).empty?
     end
   end
 
-  class UnionType < AnyType
+  class TaggedUnionType
     attr_reader :cases
-    def initialize(cases)
+    attr_reader :discriminator
+    def initialize(cases, discriminator = nil)
       @cases = cases
-      super(*cases.values)
+      @discriminator = discriminator
     end
     def to_s
-      "Union[#{cases.map { |k, t| "#{k}: #{t}"}.join(', ')}]"
+      "TaggedUnion[#{cases.map { |k, t| "#{k}: #{t}"}.join(', ')}]"
+    end
+    def check(value)
+      T.check_not_nil(self, value)
+      if !value.is_a? Hash
+        raise TypeError.new("Value '#{value.inspect.to_s}' type is #{value.class} - Hash is required for tagged union")
+      end
+    end
+    def ==(other)
+      return false
+      #      T.instance_of?(TaggedUnionType, other) and (self.cases - other.cases).empty?
     end
   end
 
@@ -107,13 +120,13 @@ module T
     end
   end
 
-  class StringFormatted
+  class StringFormattedType
     attr_reader :regex
     def initialize(regex)
       @regex = regex
     end
     def to_s
-      "String<#@regex>"
+      "StringFormatted<#@regex>"
     end
     def check(value)
       T.check_not_nil(self, value)
@@ -150,7 +163,7 @@ module T
   end
 
   def T.nilable(value_type)
-    Nilable.new(value_type)
+    NilableType.new(value_type)
   end
 
   def T.array(item_type)
@@ -161,12 +174,12 @@ module T
     HashType.new(key_type, value_type)
   end
 
-  def T.any(*typdefs)
-    AnyType.new(*typdefs)
+  def T.union(*typdefs)
+    UnionType.new(*typdefs)
   end
 
-  def T.union(*cases)
-    UnionType.new(*cases)
+  def T.tagged_union(cases, discriminator=nil)
+    TaggedUnionType.new(cases, discriminator)
   end
 
   def T.check_var(var_name, type, value)
@@ -179,7 +192,7 @@ module T
   end
 end
 
-Boolean = T.any(TrueClass, FalseClass)
-Untyped = T::UntypedType.new
-NilableUntyped = T.nilable(Untyped)
-UUID = T::StringFormatted.new(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)
+Boolean = T.union(TrueClass, FalseClass)
+Unknown = T::UnknownType.new
+NilableUnknown = T.nilable(Unknown)
+UUID = T::StringFormattedType.new(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)

@@ -14,7 +14,7 @@ end
 
 class DataClassFields < Test::Unit::TestCase
   def test_fields_meta
-    assert_equal ({:string => String, :int => Integer}), TheClass.json_attributes, "Attributes with types should be available on data class"
+    assert_equal ({:string => String, :int => Integer}), TheClass.typed_attributes, "Attributes with types should be available on data class"
   end
 
   def test_read

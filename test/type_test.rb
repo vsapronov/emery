@@ -21,7 +21,7 @@ class TypeEquality < Test::Unit::TestCase
   end
 
   def test_untyped_equals
-    assert_true Untyped == Untyped
+    assert_true Unknown == Unknown
   end
 
   def test_nilable_equals
@@ -56,16 +56,16 @@ class TypeEquality < Test::Unit::TestCase
     assert_false T.hash(String, Integer) == T.hash(String, String)
   end
 
-  def test_any_equals
-    assert_true T.any(String, Integer) == T.any(String, Integer)
+  def test_union_equals
+    assert_true T.union(String, Integer) == T.union(String, Integer)
   end
 
-  def test_any_equals_other_order
-    assert_true T.any(String, Integer) == T.any(Integer, String)
+  def test_union_equals_other_order
+    assert_true T.union(String, Integer) == T.union(Integer, String)
   end
 
-  def test_any_of_other_type
-    assert_false T.any(String, Integer) == T.any(Integer, Float)
+  def test_union_of_other_type
+    assert_false T.union(String, Integer) == T.union(Integer, Float)
   end
 end
 
@@ -82,12 +82,12 @@ class TypeToString < Test::Unit::TestCase
     assert_equal "Hash[String, Integer]", T.hash(String, Integer).to_s
   end
 
-  def test_any
-    assert_equal "Any[String, Integer]", T.any(String, Integer).to_s
+  def test_union
+    assert_equal "Union[String, Integer]", T.union(String, Integer).to_s
   end
 
-  def test_union
-    assert_equal "Union[str: String, int: Integer]", T.union(str: String, int: Integer).to_s
+  def test_tagged_union
+    assert_equal "TaggedUnion[str: String, int: Integer]", T.tagged_union({str: String, int: Integer}).to_s
   end
 end
 
@@ -146,12 +146,12 @@ class TypeCheck < Test::Unit::TestCase
   end
 
   def test_untyped_success
-    assert_equal "bla", T.check(Untyped, "bla"), "Untyped should accept strings"
+    assert_equal "bla", T.check(Unknown, "bla"), "Untyped should accept strings"
   end
 
   def test_untyped_nil
     assert_raise TypeError do
-      T.check(Untyped, nil)
+      T.check(Unknown, nil)
     end
   end
 
@@ -189,30 +189,30 @@ class TypeCheckHash < Test::Unit::TestCase
   end
 
   def test_hash_string_to_untyped
-    assert_equal({"key" => "the value"}, T.check(T.hash(String, Untyped), {"key" => "the value"}), "Hash of String -> Untyped should allow String -> String value")
-  end
-end
-
-class TypeCheckAny < Test::Unit::TestCase
-  def test_success
-    assert_equal(123, T.check(T.any(String, Integer), 123), "Any of String, Integer should allow Integer value")
-  end
-
-  def test_fail
-    assert_raise TypeError do
-      T.check(T.any(String, Integer), true)
-    end
+    assert_equal({"key" => "the value"}, T.check(T.hash(String, Unknown), { "key" => "the value"}), "Hash of String -> Untyped should allow String -> String value")
   end
 end
 
 class TypeCheckUnion < Test::Unit::TestCase
   def test_success
-    assert_equal(123, T.check(T.union(str: String, int: Integer), 123))
+    assert_equal(123, T.check(T.union(String, Integer), 123), "Any of String, Integer should allow Integer value")
   end
 
   def test_fail
     assert_raise TypeError do
-      T.check(T.union(str: String, int: Integer), true)
+      T.check(T.union(String, Integer), true)
+    end
+  end
+end
+
+class TypeCheckTaggedUnion < Test::Unit::TestCase
+  def test_success
+    assert_equal({int: 123}, T.check(T.tagged_union({str: String, int: Integer}), {int: 123}))
+  end
+
+  def test_fail
+    assert_raise TypeError do
+      T.check(T.tagged_union({str: String, int: Integer}), true)
     end
   end
 end
