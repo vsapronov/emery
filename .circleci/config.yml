@@ -12,7 +12,7 @@ jobs:
           name: Test gem
           command: |
             gem install bundler
-            export VERSION=0.0.<<pipeline.number>>
+            export VERSION=0.1.<<pipeline.number>>
             bundle --version
             bundle install
             rake test
@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Build and push gem
           command: |
-            export VERSION=0.0.<<pipeline.number>>
+            export VERSION=0.1.<<pipeline.number>>
             gem build emery.gemspec
             if [ $CIRCLE_BRANCH = "main" ]; then
               export VERSION=0.1.<<pipeline.number>>
